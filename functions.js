@@ -8,7 +8,7 @@ function fillFormFields(form, id) {
     form.elements['priority'].value = task.priority;
     form.elements['category'].value = task.category;
     form.elements['tag'].value = task.tag;
-    form.elements['due-date-time'].value = task.dueDate;
+    form.elements['due-date'].value = task.dueDate;
     form.elements['reminder'].value = task.reminder;
     form.elements['add-or-update'].value = id;
     tasks[index].subtasks.forEach(subtask => {
@@ -33,13 +33,10 @@ function addEditTask( id, isAdd = true) {
     task.priority = form.elements['priority'].value;
     task.category = form.elements['category'].value;
     task.tags = form.elements['tag'].value.trim().split(',');
-    if(form.elements['due-date-time'].value == "") {
-        let currentDate = new Date();
-        currentDate = currentDate.toISOString();
-        const eod = currentDate.slice(0, currentDate.search('T')+1) + '23:59';
-        task.dueDate = eod;
+    if(form.elements['due-date'].value == "") {
+        task.dueDate = new Date().toISOString().slice(0, 10);
     }
-    else task.dueDate = form.elements['due-date-time'].value;
+    else task.dueDate = form.elements['due-date'].value;
     task.isDone = false;
     task.subtasks = [];
     if(form.elements['reminder'].value !== '') task.reminder = new Date(form.elements['reminder'].value);
@@ -121,15 +118,15 @@ function addTaskToTheDom(task) {
         name.classList.add('name');
         category.innerHTML = task.category;
         category.classList.add('category');
-        tag.innerHTML = task.tags.join(',');
-        tag.classList.add('tag');
+        tag.innerHTML = `Tags: ${task.tags.join(',')}`;
+        tag.classList.add('tags');
         priority.innerHTML = task.priority;
         priority.classList.add('priority');
         dueDate.innerHTML = task.dueDate;
         dueDate.classList.add('due-date');
         dueDate.innerHTML = task.reminder;
         dueDate.classList.add('reminder');
-        subsets.classList.add('subtasks');
+        subtasks.classList.add('subtasks');
 
         task.subtasks.forEach(subtask => {
             const spanTag = document.createElement('span');
@@ -143,6 +140,7 @@ function addTaskToTheDom(task) {
         btnEdit.classList.add("edit-btn");
 
         taskDiv.setAttribute('id', task.id);
+        taskDiv.classList.add('task-card');
     } catch (err) {
         console.log(err);
     }
@@ -233,8 +231,6 @@ function filterByTags(tags) {
     });
     return tasksFiltered;
 }
-
-// filter by priority
 
 function sortByPriority() {
     const priorityOrder = {'high': 1, 'medium': 2, 'low': 3};
