@@ -1,7 +1,15 @@
-var tasks = [];
+var tasks = (localStorage.getItem('tasks')) ? JSON.parse(localStorage['tasks']) : [];
 var id = 1;
-var logs = [];
+var logs = (localStorage.getItem('logs')) ? JSON.parse(localStorage['logs']) : [];
 var form = document.getElementById('task-form');
+
+
+// fetching data from localstorage
+console.log('tasks');
+tasks.forEach(task => {
+    console.log('inside forEAch');
+    addTaskToTheDom(task);
+});
 
 document.addEventListener('keypress', function (e) {
     if (e.keyCode === 13 || e.which === 13) {
@@ -46,15 +54,6 @@ document.addEventListener('click', (ele) => {
 
 
 
-// fetching data from localstorage
-
-for(let taskId in localStorage) {
-    if(/^\d+$/.test(taskId)){
-        addTaskFromLocalStorage(JSON.parse(localStorage[taskId]));
-        id = parseInt(taskId);
-    }
-    
-}
 
 document.getElementById('add-subtask').addEventListener(('click'), () => {
     const subtasksDiv = document.getElementById('subtasks');

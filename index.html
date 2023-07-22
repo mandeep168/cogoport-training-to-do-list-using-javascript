@@ -12,10 +12,7 @@
             <form id="task-form" method="post">
                 <input type="hidden" value="add" name="add-or-update">
                 <label>
-                    <input type="text" placeholder="Task title..." name="task-title" required>
-                </label>
-                <label>
-                    <input type="text" placeholder="Task description..." name="task-description">
+                    <input type="text" placeholder="Task ..." name="name" required>
                 </label>
                 
                 <div>
@@ -30,6 +27,7 @@
 
                 <label for="due-date-time"></label>
                 <input type="datetime-local" name="due-date-time">
+                <input type="datetime-local" name="reminder">
 
                 <div>
                     Add a category
@@ -57,8 +55,7 @@
         <div id="tasks-div">
             <div id="0">
                 <input type="checkbox" id="checkbox">
-                <span class="title">finish the project</span>
-                <span class="description"></span>
+                <span class="name">finish the project</span>
                 <span class="category"></span>
                 <span class="tag"></span>
                 <span class="priority">low</span>
@@ -69,6 +66,7 @@
     <!-- <script src="./js1.js"></script> -->
     
     <script src="./functions.js" ></script>
+    <script src="./searchFunctions.js" ></script>
     <script src="./eventListeners.js"></script>
 </body>
 </html>
