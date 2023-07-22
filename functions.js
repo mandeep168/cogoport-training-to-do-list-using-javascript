@@ -150,8 +150,66 @@ function markDoneUndone (id, checkBox) {
 
 
 function filterByCategory(category) {
-    const tasksFiltered = tasks.filter(task => {
+    let tasksFiltered = tasks.filter(task => {
         return (task.category == category);
     });
     return tasksFiltered;
+}
+
+function filterByTags(tags) {
+    let tasksFiltered = tasks.filter(task => {
+        return (
+            task.tags.forEach(tag => {
+                tags.forEach(tagFilter => {
+                    if(tag.trim() == tagFilter.trim()) return true;
+                })
+            })
+        )
+    });
+    return tasksFiltered;
+}
+
+// filter by priority
+
+function sortByPriority() {
+    const priorityOrder = {'high': 1, 'medium': 2, 'low': 3};
+    let sortedBypriority = JSON.parse(JSON.stringify(tasks));
+    sortedBypriority.sort((a, b) => {
+        const priorityTaskA = priorityOrder[a.priority];
+        const priorityTaskB = priorityOrder[b.priority];
+        return priorityTaskA - priorityTaskB;
+    });
+    return sortedBypriority;
+}
+
+function sortByDueDate() {
+
+    let sortedByDueDate = JSON.parse(JSON.stringify(tasks));
+    sortedByDueDate.sort((a, b) => {
+        const dueDateA = new Date(a.dueDate);
+        const dueDateB = new Date(b.dueDate);
+        return !(dueDateA - dueDateB);
+    });
+    return sortedByDueDate;
+}
+
+function backlogs() {
+    
+    let sortedByDueDate = sortByDueDate();
+    let left = 0;
+    let right = sortedByDueDate.length;
+
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+
+        const midTaskDueDate = new Date(sortedByDueDate[mid].dueDate);
+        if (midTaskDueDate > new Date()) {
+            right = mid - 1;
+        } else {
+            left = mid;
+        }
+    }
+    console.log(left);
+    sortedByDueDate = sortedByDueDate.slice(0, left+1);
+    return sortedByDueDate;
 }
