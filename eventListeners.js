@@ -1,6 +1,6 @@
 var tasks = [];
 var id = 1;
-
+var logs = [];
 var form = document.getElementById('task-form');
 
 document.addEventListener('keypress', function (e) {
@@ -15,8 +15,8 @@ document.addEventListener('keypress', function (e) {
 form.addEventListener('submit', (event) => {
     event.preventDefault();
     if(form.elements['add-or-update'].value === 'add') {
-        addEditTask(id);
         id+=1;
+        addEditTask(id);
     } else{
         addEditTask(form.elements['add-or-update'].value, false);
     }
@@ -51,7 +51,15 @@ document.addEventListener('click', (ele) => {
 for(let taskId in localStorage) {
     if(/^\d+$/.test(taskId)){
         addTaskFromLocalStorage(JSON.parse(localStorage[taskId]));
-        id = taskId + 1;
+        id = parseInt(taskId);
     }
     
 }
+
+document.getElementById('add-subtask').addEventListener(('click'), () => {
+    const subtasksDiv = document.getElementById('subtasks');
+    const inputfield = document.createElement('input');
+    inputfield.type="text";
+    inputfield.name="subtask";
+    subtasksDiv.append(inputfield);
+});

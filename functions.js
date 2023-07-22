@@ -11,6 +11,14 @@ function fillFormFields(form, id) {
     form.elements['tag'].value = task.tag;
     form.elements['due-date-time'].value = task.dueDate;
     form.elements['add-or-update'].value = id;
+    tasks[index].subtasks.forEach(subtask => {
+        const subtasksDiv = document.getElementById('subtasks');
+        const inputfield = document.createElement('input');
+        inputfield.type="text";
+        inputfield.name="subtask";
+        inputfield.value = subtask;
+        subtasksDiv.append(inputfield);
+    });
 }
 
 function addTaskFromLocalStorage(task) {
@@ -26,16 +34,44 @@ function addEditTask( id, isAdd = true) {
     task.priority = form.elements['priority'].value;
     task.category = form.elements['category'].value;
     task.tags = form.elements['tag'].value.trim().split(',');
-    task.dueDate = form.elements['due-date-time'].value;
+    if(form.elements['due-date-time'].value == "") {
+        let currentDate = new Date();
+        currentDate = currentDate.toISOString();
+        const eod = currentDate.slice(0, currentDate.search('T')+1) + '23:59';
+        task.dueDate = eod;
+        console.log(task.dueDate);
+    }
+    else task.dueDate = form.elements['due-date-time'].value;
     task.isDone = false;
+    task.subtasks = [];
+    if(form.elements['subtask']){
+        if(!form.elements['subtask'].length) {
+            if(form.elements['subtask'].value.trim() !== '') task.subtasks.push(form.elements['subtask'].value.trim());
+        }
+        else {
+            form.elements['subtask'].forEach(subtask => {
+                if(subtask.value.trim() !== '') task.subtasks.push(subtask.value.trim());
+            });
+        }
+    }
 
     localStorage.setItem(id, JSON.stringify(task));
 
     if(isAdd) {
         tasks.push(task);
         addTaskToTheDom(task);
+        logs.push({
+            'action': 'added a task',
+            'taskTitle': task.title,
+            'timestamp': new Date().toString().slice(0, 24),
+        });
     }
     else {
+        logs.push({
+            'action': 'updated a task',
+            'taskTitle': task.title,
+            'timestamp': new Date().toString().slice(0, 24),
+        });
         let index = tasks.findIndex(tasks => tasks.id == id);
         if(index == -1) console.log(" addEdit TAsk task does not exist");
         else{
@@ -45,6 +81,8 @@ function addEditTask( id, isAdd = true) {
         editTaskOnDom(task);
     }
     form.reset();
+    form.elements['add-or-update'].value='add';
+    document.getElementById('subtasks').innerHTML = '';
 }
 
 function addTaskToTheDom(task) {
@@ -116,13 +154,19 @@ function editTaskOnDom(task) {
 }
 
 function deleteTask(id) {
-    localStorage.removeItem(id);
+    
+    
     try {
         let index = tasks.findIndex(tasks => tasks.id === id);
+        logs.push({
+            'action': 'Deleted a task',
+            'taskTitle': tasks[index].title,
+            'timestamp': new Date().toString().slice(0, 24),
+        });
         tasks.splice(index, 1);
         const taskDiv = document.getElementById(id);
         taskDiv.remove();
-
+        localStorage.removeItem(id);
     } catch (err) 
     {
         console.log(err);
@@ -131,13 +175,24 @@ function deleteTask(id) {
 
 function markDoneUndone (id, checkBox) {
     try{
+        
         let index = tasks.findIndex(tasks => tasks.id == id);
         const taskDiv = document.getElementById(id);
         if(checkBox.checked) {
+            logs.push({
+                'action': 'Mark a task as done',
+                'taskTitle': task.title,
+                'timestamp': new Date().toString().slice(0, 24),
+            });
             tasks[index].isDone = true;
 
             taskDiv.style.textDecoration = "line-through";
         }else {
+            logs.push({
+                'action': 'Mark a task as undone',
+                'taskTitle': task.title,
+                'timestamp': new Date().toString().slice(0, 24),
+            });
             tasks[index].isDone = false;
             taskDiv.style.textDecoration = "none";
         }
@@ -213,3 +268,5 @@ function backlogs() {
     sortedByDueDate = sortedByDueDate.slice(0, left+1);
     return sortedByDueDate;
 }
+
+// activity logs
