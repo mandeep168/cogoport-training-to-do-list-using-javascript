@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <!-- <link rel="stylesheet" href="./style.css"> -->
+</head>
+<body>
+    <div class="container">
+        <div class="add-task-container">
+            <form id="task-form" method="post">
+                <input type="hidden" value="add" name="add-or-update">
+                <label>
+                    <input type="text" placeholder="Task title..." name="task-title" required>
+                </label>
+                <label>
+                    <input type="text" placeholder="Task description..." name="task-description">
+                </label>
+                
+                <div>
+                Set priority 
+                    <input type="radio" id="low" name="priority" value="low" checked>
+                    <label for="low">Low</label> 
+                    <input type="radio" id="medium" name="priority" value="medium">
+                    <label for="medium">Medium</label> 
+                    <input type="radio" id="high" name="priority" value="high">
+                    <label for="high">High</label> 
+                </div>
+
+                <label for="due-date-time"></label>
+                <input type="datetime-local" name="due-date-time">
+
+                <div>
+                    Add a category
+                    <input type="text" name="category"/>
+                </div>
+
+                <div>
+                    <!-- show tags from the list -->
+                    <label> Add tags </label>
+                    <input type="text" name="tag" />
+                </div>
+
+                <button type="submit" id="add-task"> Add Task </button>
+                <button type="submit" id="save-task"> Update Task </button>
+            </form>
+
+            
+        </div>
+        <div id="tasks-div">
+            <div id="0">
+                <input type="checkbox" id="checkbox">
+                <span class="title">finish the project</span>
+                <span class="description"></span>
+                <span class="category"></span>
+                <span class="tag"></span>
+                <span class="priority">low</span>
+                <span class="due-date"></span>
+            </div>
+        </div>
+    </div>
+    <!-- <script src="./js1.js"></script> -->
+    
+    <script src="./functions.js" ></script>
+    <script src="./eventListeners.js"></script>
+</body>
+</html>
