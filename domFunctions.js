@@ -48,14 +48,22 @@ function addTaskToTheDiv(taskDiv, task){
 function addEditTask( id, isAdd = true) {
     let task = {};
     task.id=id;
-    task.name = form.elements['name'].value;
+    const taskText = form.elements['name'].value;
+    const dueDate = parseDueDate(taskText);
+    const formattedDueDate = dueDate ? dueDate.toISOString().slice(0, 10) : '';
+    const taskWithoutDate = taskText.replace(/(\sby\s.*|tomorrow|today)/gi, '').trim();
+
+    task.name = taskWithoutDate;
     task.priority = form.elements['priority'].value;
     task.category = form.elements['category'].value;
     task.tags = form.elements['tag'].value.trim().split(',');
-    if(form.elements['due-date'].value == "") {
+
+    if(formattedDueDate != '')
+        task.dueDate = formattedDueDate;
+    else if(form.elements['due-date'].value == "") 
         task.dueDate = new Date().toISOString().slice(0, 10);
-    }
     else task.dueDate = form.elements['due-date'].value;
+    
     task.isDone = false;
     task.subtasks = [];
     if(form.elements['reminder'].value != '') task.reminder = new Date(form.elements['reminder'].value).toISOString().slice(0, 16);
@@ -153,7 +161,7 @@ function addTaskToTheDom(task) {
         taskDiv.classList.add('task-card');
 
         addTaskToTheDiv(taskDiv, task);
-        
+
     } catch (err) {
         console.log(err);
     }

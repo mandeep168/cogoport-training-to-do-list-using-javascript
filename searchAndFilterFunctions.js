@@ -9,6 +9,35 @@ function displayTasks(filteredTasks) {
     });
 }
 
+function parseDueDate(taskText) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (taskText.toLowerCase().includes("tomorrow")) {
+      return tomorrow;
+    } else if (taskText.toLowerCase().includes("today")) {
+      return today;
+    }
+
+    const dateRegex = /(\b\d{1,2}(?:st|nd|rd|th)?\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s\d{2,4})/gi;
+    const timeRegex = /(\d{1,2}:\d{2}\s(?:am|pm))/gi;
+
+    const dateMatches = taskText.match(dateRegex);
+    const timeMatches = taskText.match(timeRegex);
+
+    if (dateMatches && dateMatches.length > 0) {
+      const parsedDate = new Date(dateMatches[0]);
+      if (timeMatches && timeMatches.length > 0) {
+        const parsedTime = new Date(`2023-01-01 ${timeMatches[0]}`);
+        parsedDate.setHours(parsedTime.getHours());
+        parsedDate.setMinutes(parsedTime.getMinutes());
+      }
+      return parsedDate;
+    }
+    return null;
+}
+
 
 function filterByCategory(category) {
     let tasksFiltered = tasks.filter(task => {
