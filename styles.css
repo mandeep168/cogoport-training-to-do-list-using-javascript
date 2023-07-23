@@ -24,9 +24,16 @@ body {
 }
 #top-container-btns > * {
     width: 80%;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}
+#top-container-btns > div {
+    border: 0.5px black solid;
+    border-radius: 8px;
 }
 #top-container-btns > div > * {
     width: 100%;
+    margin-bottom: 10px;
 }
 
   #openPopupButton {
