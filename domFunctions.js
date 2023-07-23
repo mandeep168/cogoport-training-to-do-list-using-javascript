@@ -21,9 +21,28 @@ function fillFormFields(form, id) {
     });
 }
 
-function addTaskFromLocalStorage(task) {
-    tasks.push(task);
-    addTaskToTheDom(task);
+function addTaskToTheDiv(taskDiv, task){
+    try {
+        taskDiv.getElementsByClassName('name')[0].innerHTML = task.name;
+        taskDiv.getElementsByClassName('category')[0].innerHTML = `Category: ${task.category}`;
+        if(task.tags && task.tags.length>0) taskDiv.getElementsByClassName('tags')[0].innerHTML = `Tags: ${task.tag}`;
+        else taskDiv.getElementsByClassName('tags')[0].innerHTML = 'Tags: ';
+        taskDiv.getElementsByClassName('priority')[0].innerHTML = `Priority: ${task.priority}`;
+        taskDiv.getElementsByClassName('due-date')[0].innerHTML = `Due Date: ${task.dueDate}`;
+        taskDiv.getElementsByClassName('reminder')[0].innerHTML = `Reminder: ${(task.reminder) ? task.reminder : ''}`;
+        
+        
+        const subtasks = taskDiv.getElementsByClassName('subtasks')[0];
+        taskDiv.getElementsByClassName('subtasks')[0].innerHTML = 'Subtasks: ';
+
+        task.subtasks.forEach(subtask => {
+            const spanTag = document.createElement('span');
+            spanTag.innerHTML = subtask;
+            subtasks.append(spanTag);
+        })
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 function addEditTask( id, isAdd = true) {
@@ -50,33 +69,30 @@ function addEditTask( id, isAdd = true) {
             });
         }
     }
-
+    const logEntry = {
+        'taskTitle': task.name,
+        'timestamp': new Date().toString().slice(0, 24),
+    };
     if(isAdd) {
         tasks.push(task);
         addTaskToTheDom(task);
-        logs.push({
-            'action': 'added a task',
-            'taskTitle': task.name,
-            'timestamp': new Date().toString().slice(0, 24),
-        });
+        logEntry.action = 'added a task';
     }
     else {
-        logs.push({
-            'action': 'updated a task',
-            'taskTitle': task.name,
-            'timestamp': new Date().toString().slice(0, 24),
-        });
+        logEntry.action = 'updated a task';
         let index = tasks.findIndex(tasks => tasks.id == id);
         if(index == -1) console.log("task does not exist");
         else{
             task.isDone = tasks[index].isDone;
             tasks[index] = task;
         }
-        editTaskOnDom(task);
+        const taskDiv = document.getElementById(task.id);
+        addTaskToTheDiv(taskDiv, task);
     }
     form.reset();
     form.elements['add-or-update'].value='add';
     document.getElementById('subtasks').innerHTML = '';
+    logs.push(logEntry);
     localStorage.setItem('tasks', JSON.stringify(tasks));
     localStorage.setItem('logs', JSON.stringify(logs));
 }
@@ -114,28 +130,15 @@ function addTaskToTheDom(task) {
         btns.appendChild(btnIsDone);
 
 
-        name.innerHTML = task.name;
         name.classList.add('name');
-        category.innerHTML = `Category: ${task.category}`;
         category.classList.add('category');
-        tag.innerHTML = `Tags: ${task.tags.join(',')}`;
         tag.classList.add('tags');
-        priority.innerHTML = `Priority: ${task.priority}`;
         priority.classList.add('priority');
-        dueDate.innerHTML = `Due Date: ${task.dueDate}`;
         dueDate.classList.add('due-date');
-        reminder.innerHTML = `Reminder: ${(task.reminder) ? task.reminder : ''}`;
         reminder.classList.add('reminder');
         subtasks.classList.add('subtasks');
-        subtasks.innerHTML = 'Subtasks: '
         btns.classList.add('btns');
 
-        task.subtasks.forEach(subtask => {
-            const spanTag = document.createElement('span');
-            spanTag.innerHTML = subtask;
-            subtasks.append(spanTag);
-        })
-        
         btnDelete.name = task.id;
         btnEdit.name = task.id;
         btnIsDone.name = task.id;
@@ -148,32 +151,12 @@ function addTaskToTheDom(task) {
 
         taskDiv.setAttribute('id', task.id);
         taskDiv.classList.add('task-card');
+
+        addTaskToTheDiv(taskDiv, task);
+        
     } catch (err) {
         console.log(err);
     }
-}
-
-function editTaskOnDom(task) {
-    const taskDiv = document.getElementById(task.id);
-    if(!taskDiv) console.log("div not found");
-    
-    taskDiv.getElementsByClassName('name')[0].innerHTML = task.name;
-    taskDiv.getElementsByClassName('category')[0].innerHTML = `Category: ${task.category}`;
-    if(task.tag.length>0) taskDiv.getElementsByClassName('tag')[0].innerHTML = `Tags: ${task.tag}`;
-    else taskDiv.getElementsByClassName('tag')[0].innerHTML = 'Tags: ';
-    taskDiv.getElementsByClassName('priority')[0].innerHTML = `Priority: ${task.priority}`;
-    taskDiv.getElementsByClassName('due-date')[0].innerHTML = `Due Date: ${task.dueDate}`;
-    taskDiv.getElementsByClassName('due-date')[0].reminder = `Reminder: ${(task.reminder) ? task.reminder : ''}`;
-    
-    
-    const subtasks = taskDiv.getElementsByClassName('subtasks')[0];
-    taskDiv.getElementsByClassName('subtasks')[0].innerHTML = 'Subtasks: ';
-
-    task.subtasks.forEach(subtask => {
-        const spanTag = document.createElement('span');
-        span.innerHTML = subtask;
-        subsets.append(spanTag);
-    })
 }
 
 function deleteTask(id) {
@@ -200,30 +183,26 @@ function markDoneUndone (id, btn, markDone) {
         
         let index = tasks.findIndex(tasks => tasks.id == id);
         const taskDiv = document.getElementById(id);
+        const logEntry = {
+            'taskTitle': tasks[index].name,
+            'timestamp': new Date().toString().slice(0, 24),
+        };
         if(markDone) {
-            logs.push({
-                'action': 'Mark a task as done',
-                'taskTitle': tasks[index].name,
-                'timestamp': new Date().toString().slice(0, 24),
-            });
+            logEntry.action = 'Mark a task as done';
             tasks[index].isDone = true;
-
             btn.classList.remove('mark-done-btn');
             btn.classList.add('mark-undone-btn');
             btn.innerHTML = 'Mark as Undone';
             taskDiv.style.textDecoration = "line-through";
         }else {
-            logs.push({
-                'action': 'Mark a task as undone',
-                'taskTitle': tasks[index].name,
-                'timestamp': new Date().toString().slice(0, 24),
-            });
+            logEntry.action = 'Mark a task as undone';
             tasks[index].isDone = false;
             taskDiv.style.textDecoration = "none";
             btn.classList.remove('mark-undone-btn');
             btn.classList.add('mark-done-btn');
             btn.innerHTML = 'Mark as Done';
         }
+        logs.push(logEntry);
         localStorage.setItem('tasks', JSON.stringify(tasks));
         localStorage.setItem('logs', JSON.stringify(logs));
 
@@ -234,66 +213,27 @@ function markDoneUndone (id, btn, markDone) {
 }
 
 
-function filterByCategory(category) {
-    let tasksFiltered = tasks.filter(task => {
-        return (task.category == category);
-    });
-    return tasksFiltered;
+function activityLog(log) {
+    const tasksDiv = document.getElementById('tasks-div');
+    const logDiv = document.createElement('div');
+
+    const br = document.createElement('br');
+    const br1 = document.createElement('br');
+
+    const action = document.createElement('span');
+    const name = document.createElement('span');
+    const time = document.createElement('span');
+
+    action.innerHTML = `Action: ${log.action}`;
+    name.innerHTML = `Task name: ${log.taskTitle}`;
+    time.innerHTML = log.timestamp;
+
+    tasksDiv.append(logDiv);
+    logDiv.classList.add('log-div');
+
+    logDiv.append(action);
+    logDiv.append(br);
+    logDiv.append(name);
+    logDiv.append(br1);
+    logDiv.append(time);
 }
-
-function filterByTags(tags) {
-    let tasksFiltered = tasks.filter(task => {
-        return (
-            task.tags.forEach(tag => {
-                tags.forEach(tagFilter => {
-                    if(tag.trim() == tagFilter.trim()) return true;
-                })
-            })
-        )
-    });
-    return tasksFiltered;
-}
-
-function sortByPriority() {
-    const priorityOrder = {'high': 1, 'medium': 2, 'low': 3};
-    let sortedBypriority = JSON.parse(JSON.stringify(tasks));
-    sortedBypriority.sort((a, b) => {
-        const priorityTaskA = priorityOrder[a.priority];
-        const priorityTaskB = priorityOrder[b.priority];
-        return priorityTaskA - priorityTaskB;
-    });
-    return sortedBypriority;
-}
-
-function sortByDueDate() {
-
-    let sortedByDueDate = JSON.parse(JSON.stringify(tasks));
-    sortedByDueDate.sort((a, b) => {
-        const dueDateA = new Date(a.dueDate);
-        const dueDateB = new Date(b.dueDate);
-        return !(dueDateA - dueDateB);
-    });
-    return sortedByDueDate;
-}
-
-function backlogs() {
-    
-    let sortedByDueDate = sortByDueDate();
-    let left = 0;
-    let right = sortedByDueDate.length;
-
-    while (left < right) {
-        const mid = Math.floor((left + right) / 2);
-
-        const midTaskDueDate = new Date(sortedByDueDate[mid].dueDate);
-        if (midTaskDueDate > new Date()) {
-            right = mid - 1;
-        } else {
-            left = mid;
-        }
-    }
-
-    sortedByDueDate = sortedByDueDate.slice(0, left+1);
-    return sortedByDueDate;
-}
-
