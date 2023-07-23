@@ -117,3 +117,4 @@ document.getElementById('tags-search').addEventListener(('click'), () => {
     const inputField = document.getElementById('tags-search-input');
     displayTasks(searchByTags(inputField.value.split(',')));
 });
+

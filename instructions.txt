@@ -1,0 +1,15 @@
+Application is made using html, css and javascript
+
+For adding a new task -> click Add Task button on the left, fill the form in the pop up and click add task
+
+For Editing an existing task -> click edit on that task, update the form in the pop up and click add task
+
+For Deleting an existing task -> click Delete button on that task and the task will get deleted
+
+For Marking an existing task as done and undone -> click Mark as Done button on that task and the task will be marked as done
+
+For seaching and Filtering ->  there are buttons on the left of the page with appropriate names
+
+For showing Backlogs and activity logs as well, there are buttons with appropriate names
+
+
