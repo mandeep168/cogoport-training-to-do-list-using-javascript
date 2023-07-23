@@ -39,7 +39,7 @@ function addEditTask( id, isAdd = true) {
     else task.dueDate = form.elements['due-date'].value;
     task.isDone = false;
     task.subtasks = [];
-    if(form.elements['reminder'].value !== '') task.reminder = new Date(form.elements['reminder'].value);
+    if(form.elements['reminder'].value != '') task.reminder = new Date(form.elements['reminder'].value).toISOString().slice(0, 16);
     if(form.elements['subtask']){
         if(!form.elements['subtask'].length) {
             if(form.elements['subtask'].value.trim() !== '') task.subtasks.push(form.elements['subtask'].value.trim());
@@ -56,14 +56,14 @@ function addEditTask( id, isAdd = true) {
         addTaskToTheDom(task);
         logs.push({
             'action': 'added a task',
-            'taskTitle': task.title,
+            'taskTitle': task.name,
             'timestamp': new Date().toString().slice(0, 24),
         });
     }
     else {
         logs.push({
             'action': 'updated a task',
-            'taskTitle': task.title,
+            'taskTitle': task.name,
             'timestamp': new Date().toString().slice(0, 24),
         });
         let index = tasks.findIndex(tasks => tasks.id == id);
@@ -86,7 +86,7 @@ function addTaskToTheDom(task) {
         const tasksDiv = document.getElementById('tasks-div');
         const taskDiv = document.createElement('div');
         const subtasks = document.createElement('div');
-        const checkBox = document.createElement('input');
+        const btns = document.createElement('div');
         const name = document.createElement('span');
         const category = document.createElement('span');
         const tag = document.createElement('span');
@@ -96,48 +96,55 @@ function addTaskToTheDom(task) {
         
         const btnDelete = document.createElement('button');
         const btnEdit = document.createElement('button');
-
+        const btnIsDone = document.createElement('button');
+        
 
         tasksDiv.appendChild(taskDiv);
-        taskDiv.appendChild(checkBox);
         taskDiv.appendChild(name);
+        taskDiv.appendChild(priority);
         taskDiv.appendChild(category);
         taskDiv.appendChild(tag);
-        taskDiv.appendChild(priority);
         taskDiv.appendChild(dueDate);
         taskDiv.appendChild(reminder);
-        taskDiv.appendChild(btnEdit);
-        taskDiv.appendChild(btnDelete);
         taskDiv.appendChild(subtasks);
+        taskDiv.appendChild(btns);
+
+        btns.appendChild(btnEdit);
+        btns.appendChild(btnDelete);
+        btns.appendChild(btnIsDone);
 
 
-        checkBox.type="checkbox";
-        checkBox.name=task.id;
-        checkBox.classList.add('checkbox');
         name.innerHTML = task.name;
         name.classList.add('name');
-        category.innerHTML = task.category;
+        category.innerHTML = `Category: ${task.category}`;
         category.classList.add('category');
         tag.innerHTML = `Tags: ${task.tags.join(',')}`;
         tag.classList.add('tags');
-        priority.innerHTML = task.priority;
+        priority.innerHTML = `Priority: ${task.priority}`;
         priority.classList.add('priority');
-        dueDate.innerHTML = task.dueDate;
+        dueDate.innerHTML = `Due Date: ${task.dueDate}`;
         dueDate.classList.add('due-date');
-        dueDate.innerHTML = task.reminder;
-        dueDate.classList.add('reminder');
+        reminder.innerHTML = `Reminder: ${(task.reminder) ? task.reminder : ''}`;
+        reminder.classList.add('reminder');
         subtasks.classList.add('subtasks');
+        subtasks.innerHTML = 'Subtasks: '
+        btns.classList.add('btns');
 
         task.subtasks.forEach(subtask => {
             const spanTag = document.createElement('span');
-            span.innerHTML = subtask;
-            subsets.append(spanTag);
+            spanTag.innerHTML = subtask;
+            subtasks.append(spanTag);
         })
         
         btnDelete.name = task.id;
         btnEdit.name = task.id;
+        btnIsDone.name = task.id;
+        btnEdit.innerHTML = 'Edit';
+        btnDelete.innerHTML = 'Delete';
+        btnIsDone.innerHTML = 'Mark as Done';
         btnDelete.classList.add("delete-btn");
         btnEdit.classList.add("edit-btn");
+        btnIsDone.classList.add("mark-done-btn");
 
         taskDiv.setAttribute('id', task.id);
         taskDiv.classList.add('task-card');
@@ -151,21 +158,30 @@ function editTaskOnDom(task) {
     if(!taskDiv) console.log("div not found");
     
     taskDiv.getElementsByClassName('name')[0].innerHTML = task.name;
-    taskDiv.getElementsByClassName('category')[0].innerHTML = task.category;
-    taskDiv.getElementsByClassName('tag')[0].innerHTML = task.tag;
-    taskDiv.getElementsByClassName('priority')[0].innerHTML = task.priority;
-    taskDiv.getElementsByClassName('due-date')[0].innerHTML = task.dueDate;
+    taskDiv.getElementsByClassName('category')[0].innerHTML = `Category: ${task.category}`;
+    if(task.tag.length>0) taskDiv.getElementsByClassName('tag')[0].innerHTML = `Tags: ${task.tag}`;
+    else taskDiv.getElementsByClassName('tag')[0].innerHTML = 'Tags: ';
+    taskDiv.getElementsByClassName('priority')[0].innerHTML = `Priority: ${task.priority}`;
+    taskDiv.getElementsByClassName('due-date')[0].innerHTML = `Due Date: ${task.dueDate}`;
+    taskDiv.getElementsByClassName('due-date')[0].reminder = `Reminder: ${(task.reminder) ? task.reminder : ''}`;
+    
+    
+    const subtasks = taskDiv.getElementsByClassName('subtasks')[0];
+    taskDiv.getElementsByClassName('subtasks')[0].innerHTML = 'Subtasks: ';
 
+    task.subtasks.forEach(subtask => {
+        const spanTag = document.createElement('span');
+        span.innerHTML = subtask;
+        subsets.append(spanTag);
+    })
 }
 
 function deleteTask(id) {
-    
-    
     try {
-        let index = tasks.findIndex(tasks => tasks.id === id);
+        let index = tasks.findIndex(tasks => tasks.id == id);
         logs.push({
             'action': 'Deleted a task',
-            'taskTitle': tasks[index].title,
+            'taskTitle': tasks[index].name,
             'timestamp': new Date().toString().slice(0, 24),
         });
         tasks.splice(index, 1);
@@ -179,28 +195,34 @@ function deleteTask(id) {
     }
 }
 
-function markDoneUndone (id, checkBox) {
+function markDoneUndone (id, btn, markDone) {
     try{
         
         let index = tasks.findIndex(tasks => tasks.id == id);
         const taskDiv = document.getElementById(id);
-        if(checkBox.checked) {
+        if(markDone) {
             logs.push({
                 'action': 'Mark a task as done',
-                'taskTitle': task.title,
+                'taskTitle': tasks[index].name,
                 'timestamp': new Date().toString().slice(0, 24),
             });
             tasks[index].isDone = true;
 
+            btn.classList.remove('mark-done-btn');
+            btn.classList.add('mark-undone-btn');
+            btn.innerHTML = 'Mark as Undone';
             taskDiv.style.textDecoration = "line-through";
         }else {
             logs.push({
                 'action': 'Mark a task as undone',
-                'taskTitle': task.title,
+                'taskTitle': tasks[index].name,
                 'timestamp': new Date().toString().slice(0, 24),
             });
             tasks[index].isDone = false;
             taskDiv.style.textDecoration = "none";
+            btn.classList.remove('mark-undone-btn');
+            btn.classList.add('mark-done-btn');
+            btn.innerHTML = 'Mark as Done';
         }
         localStorage.setItem('tasks', JSON.stringify(tasks));
         localStorage.setItem('logs', JSON.stringify(logs));

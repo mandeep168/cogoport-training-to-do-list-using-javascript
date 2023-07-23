@@ -8,45 +8,56 @@
 </head>
 <body>
     <div class="container">
-        <div class="add-task-container">
+        
+        <button id="openPopupButton"> Add Task </button>
+        <div class="add-task-container" id="add-task-container">
             <form id="task-form" method="post">
+                <span class="close-button" id="closePopupButton">&times;</span>
+
                 <input type="hidden" value="add" name="add-or-update">
                 <label>
                     <input type="text" placeholder="Task ..." name="name" required>
                 </label>
                 
-                <div>
+                <div id="priority">
                 Set priority 
-                    <input type="radio" id="low" name="priority" value="low" checked>
-                    <label for="low">Low</label> 
-                    <input type="radio" id="medium" name="priority" value="medium">
-                    <label for="medium">Medium</label> 
-                    <input type="radio" id="high" name="priority" value="high">
-                    <label for="high">High</label> 
+                    <div>
+                        <input type="radio" id="low" name="priority" value="low" checked>
+                        <label for="low">Low</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="medium" name="priority" value="medium">
+                        <label for="medium">Medium</label>
+                    </div> 
+                    <div>
+                        <input type="radio" id="high" name="priority" value="high">
+                        <label for="high">High</label> 
+                    </div>
+                    
                 </div>
 
                 <label for="due-date">Due Date</label>
-                <input type="date" name="due-date">
+                <input type="date" name="due-date"><br>
 
                 <label for="reminder">Set Reminder</label>
                 <input type="datetime-local" name="reminder">
 
                 <div>
                     Add a category
-                    <input type="text" name="category"/>
+                    <input type="text" name="category" placeholder="Category..."/>
                 </div>
 
                 <div>
                     <!-- show tags from the list -->
                     <label> Add tags </label>
-                    <input type="text" name="tag" />
+                    <input type="text" name="tag" placeholder="Tags ..."/>
                 </div>
 
                 <label>Subtasks</label> 
                 <div id="subtasks"> 
                     <!-- <input type="text" name="subtask"> -->
                 </div>
-                <button type="button" id="add-subtask"> add subtask </button>
+                <button type="button" id="add-subtask"> Add Subtask </button>
 
                 <button type="submit" id="add-task"> Add Task </button>
                 <!-- <button type="submit" id="save-task"> Update Task </button> -->

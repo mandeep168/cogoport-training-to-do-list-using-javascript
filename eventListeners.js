@@ -3,12 +3,19 @@ var id = 1;
 var logs = (localStorage.getItem('logs')) ? JSON.parse(localStorage['logs']) : [];
 var form = document.getElementById('task-form');
 
+const openPopupButton = document.getElementById("openPopupButton");
+const closePopupButton = document.getElementById("closePopupButton");
+const AddTaskContainer = document.getElementById("add-task-container");
+
+// for opening form as pop up
+openPopupButton.addEventListener("click", () => {
+    AddTaskContainer.style.display = "flex";
+});
 
 // fetching data from localstorage
-console.log('tasks');
 tasks.forEach(task => {
-    console.log('inside forEAch');
     addTaskToTheDom(task);
+    id = task.id;
 });
 
 document.addEventListener('keypress', function (e) {
@@ -22,16 +29,14 @@ document.addEventListener('keypress', function (e) {
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
+    AddTaskContainer.style.display = "none";
     if(form.elements['add-or-update'].value === 'add') {
         id+=1;
         addEditTask(id);
     } else{
         addEditTask(form.elements['add-or-update'].value, false);
     }
-    
 });
-
-
 
 
 document.addEventListener('click', (ele) => {
@@ -44,15 +49,15 @@ document.addEventListener('click', (ele) => {
         fillFormFields(form, ele.target.name);
         return;
     }
-    if(ele.target.classList.contains('checkbox')){
-        markDoneUndone(ele.target.name, ele.target);
+    if(ele.target.classList.contains('mark-done-btn')){
+        markDoneUndone(ele.target.name, ele.target, true);
         return;
     }
-
-
+    if(ele.target.classList.contains('mark-undone-btn')){
+        markDoneUndone(ele.target.name, ele.target, false);
+        return;
+    }
 }) ;
-
-
 
 
 document.getElementById('add-subtask').addEventListener(('click'), () => {
