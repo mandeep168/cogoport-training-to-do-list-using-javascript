@@ -81,8 +81,7 @@
         <div class="add-task-container" id="add-task-container">
             <form id="task-form" method="post">
                 <input type="hidden" value="add" name="add-or-update">
-                <label></label>
-                    <input type="text" placeholder="Task ..." name="name" required>
+                    <input id="task-name" type="text" placeholder="Task ..." name="name" required>
                 
                 
                 <div id="priority">
@@ -103,7 +102,7 @@
                 </div>
 
                 <label for="due-date">Due Date</label>
-                <input type="date" name="due-date"><br>
+                <input id='due-date' type="date" name="due-date"><br>
 
                 <label for="reminder">Set Reminder</label>
                 <input type="datetime-local" name="reminder">

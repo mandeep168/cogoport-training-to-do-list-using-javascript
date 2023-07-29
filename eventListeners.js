@@ -118,3 +118,6 @@ document.getElementById('clear-filters').addEventListener(('click'), () => {
     document.getElementById('priority').value = 'all';
     document.getElementById('sort-by').value = 'dueDate';
 });
+document.getElementById('task-name').addEventListener(('click'), () => {
+    parseDueDate();
+});

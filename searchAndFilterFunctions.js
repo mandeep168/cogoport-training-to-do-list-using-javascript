@@ -9,15 +9,27 @@ function displayTasks(filteredTasks) {
     });
 }
 
-function parseDueDate(taskText) {
+function parseDueDate() {
+
+    let taskText = document.getElementById('task-name').value.trim();
+    
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
     if (taskText.toLowerCase().includes("tomorrow")) {
-      return tomorrow;
+       document.getElementById('task-name').value = taskText.replace(/(\sby\s.*|tomorrow|today)/gi, '').trim();
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        const formattedDate = tomorrow.toISOString().split('T')[0];
+        document.getElementById('due-date').value = formattedDate;
+        return;
     } else if (taskText.toLowerCase().includes("today")) {
-      return today;
+       document.getElementById('task-name').value = taskText.replace(/(\sby\s.*|tomorrow|today)/gi, '').trim();
+       const today = new Date();
+       const formattedDate = today.toISOString().split('T')[0];
+       document.getElementById('due-date').value = formattedDate;
+       return ;
     }
 
     const dateRegex = /(\b\d{1,2}(?:st|nd|rd|th)?\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s\d{2,4})/gi;
@@ -33,6 +45,12 @@ function parseDueDate(taskText) {
         parsedDate.setHours(parsedTime.getHours());
         parsedDate.setMinutes(parsedTime.getMinutes());
       }
+      
+    const taskText = document.getElementById('task-name').value;
+    const formattedDueDate = parsedDate ? parsedDate.toISOString().slice(0, 10) : '';
+    taskText.replace(/(\sby\s.*|tomorrow|today)/gi, '').trim();
+    document.getElementById('due-date').value = formattedDueDate;
+
       return parsedDate;
     }
     return null;
@@ -110,39 +128,6 @@ function backlogs() {
 }
 
 
-// // Function for searching by (exact) task name
-// function searchExact(searchTerm) {
-//     const searchedTasks = tasks.filter(task => task.name.toLowerCase() === searchTerm.toLowerCase());
-//     return searchedTasks;
-// }
-
-// // Function for searching based on subtasks
-// function searchBySubtasks(subtasks) {
-//     const searchedTasks = tasks.filter(task => subtasks.some(subtask => task.subtasks.includes(subtask.toLowerCase())));
-//     return searchedTasks;
-// }
-
-
-// // Function for searching based on similar words
-// function searchBySimilarWords(searchTerm) {
-//     const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase()));
-//     return searchedTasks;
-// }
-
-// // Function for searhcing based on partial keywords
-// function searchPartial(searchTerm) {
-//     const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase())); 
-//     return searchedTasks;
-// }
-
-// // Function for searhcing based on tags
-// function searchByTags(tags) {
-//     tags = searchTerm.split(',');
-//     const searchedTasks = tasks.filter(task => tags.some(t => task.tags.includes(t.toLowerCase())));
-//     return searchedTasks;
-// }
-
-
 function search(combinedSearch, searchByTags) {
     const searchKeywords = combinedSearch.split(",").map((keyword) => keyword.trim());
     const tagSearchKeywords = searchByTags.split(",").map((keyword) => keyword.trim());
@@ -184,9 +169,6 @@ function search(combinedSearch, searchByTags) {
         })
     });
 
-    // console.log(searchKeywords);
-    // console.log(tagSearchKeywords);
-    // console.log(searchResults);
     return searchResults;
 }
 

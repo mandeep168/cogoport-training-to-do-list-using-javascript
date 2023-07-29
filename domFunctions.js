@@ -71,12 +71,9 @@ function addTaskToTheDiv(taskDiv, task){
 function addEditTask( id, isAdd = true) {
     let task = {};
     task.id=id;
-    const taskText = form.elements['name'].value;
-    const dueDate = parseDueDate(taskText);
-    const formattedDueDate = dueDate ? dueDate.toISOString().slice(0, 10) : '';
-    const taskWithoutDate = taskText.replace(/(\sby\s.*|tomorrow|today)/gi, '').trim();
+    const taskText = form.elements['name'].value();
 
-    task.name = taskWithoutDate;
+    task.name = taskText;
     task.priority = form.elements['priority'].value;
     task.category = form.elements['category'].value.trim();
     task.tags = form.elements['tag'].value.trim().split(',');
