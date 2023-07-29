@@ -2,7 +2,7 @@ const tasksDiv = document.getElementById('tasks-div');
 
 // display the searched/filtered tasks 
 function displayTasks(filteredTasks) {
-    console.log(filteredTasks);
+    // console.log(filteredTasks);
     tasksDiv.innerHTML = '';
     filteredTasks.forEach((task) => {
         addTaskToTheDom(task);
@@ -38,104 +38,156 @@ function parseDueDate(taskText) {
     return null;
 }
 
+function filter() {
+    const category = document.getElementById('category-filter').value.trim();
+    const fromDueDate = document.getElementById('due-date-range-from').value;
+    const toDueDate = document.getElementById('due-date-range-to').value;
+    const priority = document.getElementById('priority').value;
+    const sortBy = document.getElementById('sort-by').value;
 
-function filterByCategory(category) {
-    let tasksFiltered = tasks.filter(task => {
+    let filterdItems = filterByDueDate(fromDueDate, toDueDate);
+    filterdItems = filterByCategory(category, filterdItems);
+    filterdItems = filterByPriority(priority, filterdItems);
+    if(sortBy == 'priority') {
+        filterdItems = sortByPriority(filterdItems);
+    }
+    else if(sortBy == 'dueDate') {
+        filterdItems = sortByDueDate(filterdItems);
+    }
+
+    return filterdItems;
+}
+
+function filterByDueDate(from, to) {
+    const tasksList =  tasks.filter(task => {
+        return (to == '' || task.dueDate <= to) && (from == '' || task.dueDate >= from);
+    })
+    return tasksList;
+}
+
+function filterByCategory(category, taskList) {
+    if(category == '') return taskList;
+    let tasksFiltered = taskList.filter(task => {
         return (task.category == category);
     });
     return tasksFiltered;
 }
 
-function filterByTags(tags) {
-    let tasksFiltered = tasks.filter(task => {
-        return (
-            task.tags.forEach(tag => {
-                tags.forEach(tagFilter => {
-                    if(tag.trim() == tagFilter.trim()) return true;
-                })
-            })
-        )
-    });
-    return tasksFiltered;
-}
+function filterByPriority(priority, tasksList) {
+    if(priority == 'all' || priority == '') return tasksList;
 
-function sortByPriority() {
+    return tasksList.filter(task => {
+        return task.priority == priority;
+    });
+}
+function sortByPriority(taskList) {
     const priorityOrder = {'high': 1, 'medium': 2, 'low': 3};
-    let sortedBypriority = JSON.parse(JSON.stringify(tasks));
-    sortedBypriority.sort((a, b) => {
+    taskList.sort((a, b) => {
         const priorityTaskA = priorityOrder[a.priority];
         const priorityTaskB = priorityOrder[b.priority];
         return priorityTaskA - priorityTaskB;
     });
-    return sortedBypriority;
+    return taskList;
 }
 
-function sortByDueDate() {
-
-    let sortedByDueDate = JSON.parse(JSON.stringify(tasks));
-    sortedByDueDate.sort((a, b) => {
+function sortByDueDate(taskList) {
+    taskList.sort((a, b) => {
         const dueDateA = new Date(a.dueDate);
         const dueDateB = new Date(b.dueDate);
         return dueDateA - dueDateB;
     });
-    return sortedByDueDate;
+    return taskList;
 }
 
 function backlogs() {
     try{
-        let sortedByDueDate = sortByDueDate();
-        let left = 0;
-        let right = sortedByDueDate.length;
-
-        while (left < right) {
-            const mid = Math.floor((left + right) / 2);
-
-            const midTaskDueDate = new Date(sortedByDueDate[mid].dueDate);
-            if (midTaskDueDate > new Date()) {
-                right = mid - 1;
-            } else {
-                left = mid;
-            }
-        }
-
-        sortedByDueDate = sortedByDueDate.slice(0, left+1);
-        return sortedByDueDate;
+        return tasks.filter(task => {
+            return new Date(task.dueDate) < new Date();
+        })
     } catch (err) {
         console.log(err);
     }
 }
 
 
-// Function for searching by (exact) task name
-function searchExact(searchTerm) {
-    const searchedTasks = tasks.filter(task => task.name.toLowerCase() === searchTerm.toLowerCase());
-    return searchedTasks;
-}
+// // Function for searching by (exact) task name
+// function searchExact(searchTerm) {
+//     const searchedTasks = tasks.filter(task => task.name.toLowerCase() === searchTerm.toLowerCase());
+//     return searchedTasks;
+// }
 
-// Function for searching based on subtasks
-function searchBySubtasks(subtasks) {
-    const searchedTasks = tasks.filter(task => subtasks.some(subtask => task.subtasks.includes(subtask.toLowerCase())));
-    return searchedTasks;
-}
+// // Function for searching based on subtasks
+// function searchBySubtasks(subtasks) {
+//     const searchedTasks = tasks.filter(task => subtasks.some(subtask => task.subtasks.includes(subtask.toLowerCase())));
+//     return searchedTasks;
+// }
 
 
-// Function for searching based on similar words
-function searchBySimilarWords(searchTerm) {
-    const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    return searchedTasks;
-}
+// // Function for searching based on similar words
+// function searchBySimilarWords(searchTerm) {
+//     const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase()));
+//     return searchedTasks;
+// }
 
-// Function for searhcing based on partial keywords
-function searchPartial(searchTerm) {
-    const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase())); 
-    return searchedTasks;
-}
+// // Function for searhcing based on partial keywords
+// function searchPartial(searchTerm) {
+//     const searchedTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm.toLowerCase())); 
+//     return searchedTasks;
+// }
 
-// Function for searhcing based on tags
-function searchByTags(tags) {
-    tags = searchTerm.split(',');
-    const searchedTasks = tasks.filter(task => tags.some(t => task.tags.includes(t.toLowerCase())));
-    return searchedTasks;
+// // Function for searhcing based on tags
+// function searchByTags(tags) {
+//     tags = searchTerm.split(',');
+//     const searchedTasks = tasks.filter(task => tags.some(t => task.tags.includes(t.toLowerCase())));
+//     return searchedTasks;
+// }
+
+
+function search(combinedSearch, searchByTags) {
+    const searchKeywords = combinedSearch.split(",").map((keyword) => keyword.trim());
+    const tagSearchKeywords = searchByTags.split(",").map((keyword) => keyword.trim());
+    const searchResults = [];
+
+    searchKeywords.forEach((keyword) => {
+        const searchTermLower = keyword.toLowerCase();
+        const results = tasks.filter((task) => {
+            const taskNameLower = task.name.toLowerCase();
+            const subtasksLower = task.subtasks.map((subtask) => subtask.name.toLowerCase());
+            const tagsLower = task.tags.map((tag) => tag.toLowerCase());
+
+            return (
+                taskNameLower.includes(searchTermLower) || // Partial search for task names
+                taskNameLower === searchTermLower || // Exact search for task names
+                taskNameLower.includes(searchTermLower) || // Similar words search for task names
+                subtasksLower.some((subtask) => subtask.includes(searchTermLower)) // Search in subtasks
+                // tagsLower.some((tag) => tag.includes(searchTermLower)) // Search in subtasks
+            );
+        });
+    
+        results.forEach(result => {
+            if(!searchResults.includes(result)) searchResults.push(result);
+        })
+    });
+
+    tagSearchKeywords.forEach((keyword) => {
+        const searchTermLower = keyword.toLowerCase();
+        const results = tasks.filter((task) => {
+            const tagsLower = task.tags.map((tag) => tag.toLowerCase());
+
+            return (
+                tagsLower.some((tag) => tag.includes(searchTermLower)) // Search in tags
+            );
+        });
+    
+        results.forEach(result => {
+            if(!searchResults.includes(result)) searchResults.push(result);
+        })
+    });
+
+    // console.log(searchKeywords);
+    // console.log(tagSearchKeywords);
+    // console.log(searchResults);
+    return searchResults;
 }
 
 // Reminders

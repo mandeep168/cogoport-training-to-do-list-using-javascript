@@ -25,7 +25,15 @@ function addTaskToTheDiv(taskDiv, task){
     try {
         taskDiv.getElementsByClassName('name')[0].innerHTML = task.name;
         taskDiv.getElementsByClassName('category')[0].innerHTML = `Category: ${task.category}`;
-        if(task.tags && task.tags.length>0) taskDiv.getElementsByClassName('tags')[0].innerHTML = `Tags: ${task.tag}`;
+        if(task.tags && task.tags.length>0) {
+            taskDiv.getElementsByClassName('tags')[0].innerHTML = `Tags: `;
+            task.tags.forEach((tag) => {
+                const spanTag = document.createElement('span');
+                spanTag.innerHTML = tag;
+                taskDiv.getElementsByClassName('tags')[0].append(spanTag);
+            })
+
+        }
         else taskDiv.getElementsByClassName('tags')[0].innerHTML = 'Tags: ';
         taskDiv.getElementsByClassName('priority')[0].innerHTML = `Priority: ${task.priority}`;
         taskDiv.getElementsByClassName('due-date')[0].innerHTML = `Due Date: ${task.dueDate}`;
@@ -33,12 +41,27 @@ function addTaskToTheDiv(taskDiv, task){
         
         
         const subtasks = taskDiv.getElementsByClassName('subtasks')[0];
-        taskDiv.getElementsByClassName('subtasks')[0].innerHTML = 'Subtasks: ';
+        subtasks.innerHTML = 'Subtasks: ';
 
-        task.subtasks.forEach(subtask => {
+        task.subtasks.forEach((subtask, index) => {
+
+            const subtaskDiv = document.createElement('div');
+            const checkbox = document.createElement('input');
             const spanTag = document.createElement('span');
-            spanTag.innerHTML = subtask;
-            subtasks.append(spanTag);
+
+            spanTag.innerHTML = subtask.name;
+            if(subtask.isDone) {
+                checkbox.checked = true;
+                subtaskDiv.classList.add('marked-done');
+            }
+            checkbox.setAttribute('type', 'checkbox');
+            checkbox.setAttribute('name', `${task.id}-${index}`);
+            checkbox.classList.add('subtask-mark-done');
+            subtaskDiv.setAttribute('id', `${task.id}-${index}`);
+
+            subtaskDiv.append(checkbox);
+            subtaskDiv.append(spanTag);
+            subtasks.append(subtaskDiv);
         })
     } catch (err) {
         console.log(err);
@@ -55,12 +78,12 @@ function addEditTask( id, isAdd = true) {
 
     task.name = taskWithoutDate;
     task.priority = form.elements['priority'].value;
-    task.category = form.elements['category'].value;
+    task.category = form.elements['category'].value.trim();
     task.tags = form.elements['tag'].value.trim().split(',');
 
     if(formattedDueDate != '')
         task.dueDate = formattedDueDate;
-    else if(form.elements['due-date'].value == "") 
+    else if(form.elements['due-date'].value.trim() == "") 
         task.dueDate = new Date().toISOString().slice(0, 10);
     else task.dueDate = form.elements['due-date'].value;
     
@@ -69,11 +92,17 @@ function addEditTask( id, isAdd = true) {
     if(form.elements['reminder'].value != '') task.reminder = new Date(form.elements['reminder'].value).toISOString().slice(0, 16);
     if(form.elements['subtask']){
         if(!form.elements['subtask'].length) {
-            if(form.elements['subtask'].value.trim() !== '') task.subtasks.push(form.elements['subtask'].value.trim());
+            if(form.elements['subtask'].value.trim() !== '') task.subtasks.push({
+                name: form.elements['subtask'].value.trim(),
+                isDone: false,
+            });
         }
         else {
             form.elements['subtask'].forEach(subtask => {
-                if(subtask.value.trim() !== '') task.subtasks.push(subtask.value.trim());
+                if(subtask.value.trim() !== '') task.subtasks.push({
+                    name: subtask.value.trim(),
+                    isDone: false,
+                });
             });
         }
     }
@@ -100,7 +129,7 @@ function addEditTask( id, isAdd = true) {
     form.reset();
     form.elements['add-or-update'].value='add';
     document.getElementById('subtasks').innerHTML = '';
-    logs.push(logEntry);
+    logs.unshift(logEntry);
     localStorage.setItem('tasks', JSON.stringify(tasks));
     localStorage.setItem('logs', JSON.stringify(logs));
 }
@@ -113,7 +142,7 @@ function addTaskToTheDom(task) {
         const btns = document.createElement('div');
         const name = document.createElement('span');
         const category = document.createElement('span');
-        const tag = document.createElement('span');
+        const tagsDiv = document.createElement('div');
         const priority = document.createElement('span');
         const dueDate = document.createElement('span');
         const reminder = document.createElement('span');
@@ -127,7 +156,7 @@ function addTaskToTheDom(task) {
         taskDiv.appendChild(name);
         taskDiv.appendChild(priority);
         taskDiv.appendChild(category);
-        taskDiv.appendChild(tag);
+        taskDiv.appendChild(tagsDiv);
         taskDiv.appendChild(dueDate);
         taskDiv.appendChild(reminder);
         taskDiv.appendChild(subtasks);
@@ -140,7 +169,7 @@ function addTaskToTheDom(task) {
 
         name.classList.add('name');
         category.classList.add('category');
-        tag.classList.add('tags');
+        tagsDiv.classList.add('tags');
         priority.classList.add('priority');
         dueDate.classList.add('due-date');
         reminder.classList.add('reminder');
@@ -170,7 +199,7 @@ function addTaskToTheDom(task) {
 function deleteTask(id) {
     try {
         let index = tasks.findIndex(tasks => tasks.id == id);
-        logs.push({
+        logs.unshift({
             'action': 'Deleted a task',
             'taskTitle': tasks[index].name,
             'timestamp': new Date().toString().slice(0, 24),
@@ -201,16 +230,18 @@ function markDoneUndone (id, btn, markDone) {
             btn.classList.remove('mark-done-btn');
             btn.classList.add('mark-undone-btn');
             btn.innerHTML = 'Mark as Undone';
-            taskDiv.style.textDecoration = "line-through";
+            // taskDiv.style.textDecoration = "line-through";
+            taskDiv.classList.add('marked-done');
         }else {
             logEntry.action = 'Mark a task as undone';
             tasks[index].isDone = false;
-            taskDiv.style.textDecoration = "none";
+            // taskDiv.style.textDecoration = "none";
+            taskDiv.classList.remove('marked-done');
             btn.classList.remove('mark-undone-btn');
             btn.classList.add('mark-done-btn');
             btn.innerHTML = 'Mark as Done';
         }
-        logs.push(logEntry);
+        logs.unshift(logEntry);
         localStorage.setItem('tasks', JSON.stringify(tasks));
         localStorage.setItem('logs', JSON.stringify(logs));
 
@@ -232,8 +263,8 @@ function activityLog(log) {
     const name = document.createElement('span');
     const time = document.createElement('span');
 
-    action.innerHTML = `Action: ${log.action}`;
-    name.innerHTML = `Task name: ${log.taskTitle}`;
+    action.innerHTML = `<strong>Action:</strong> ${log.action}`;
+    name.innerHTML = `<strong>Task name:</strong> ${log.taskTitle}`;
     time.innerHTML = log.timestamp;
 
     tasksDiv.append(logDiv);
@@ -244,4 +275,36 @@ function activityLog(log) {
     logDiv.append(name);
     logDiv.append(br1);
     logDiv.append(time);
+}
+
+
+function markSubtaskDone(id, index, checkbox) {
+    try{
+        
+        let taskIndex = tasks.findIndex(tasks => tasks.id == id);
+        const subtaskDiv = document.getElementById(`${id}-${index}`);
+        const logEntry = {
+            'taskTitle': tasks[taskIndex].name,
+            'timestamp': new Date().toString().slice(0, 24),
+        };
+        if(checkbox.checked) {
+            logEntry.action = `Mark a subtask <i> ${tasks[taskIndex].subtasks[index].name} </i> as done`;
+            tasks[taskIndex].subtasks[index].isDone = true;
+            // subtaskDiv.style.textDecoration = "line-through";
+            subtaskDiv.classList.add('marked-done');
+        }else {
+            logEntry.action = `Mark a subtask <i> ${tasks[taskIndex].subtasks[index].name} </i> as undone`;
+            tasks[taskIndex].subtasks[index].isDone = false;
+            // subtaskDiv.style.textDecoration = "none";
+            
+            subtaskDiv.classList.remove('marked-done');
+        }
+        logs.unshift(logEntry);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        localStorage.setItem('logs', JSON.stringify(logs));
+
+    } catch (err) {
+        console.log(err)
+    }
+
 }

@@ -5,6 +5,122 @@ body {
     background-color: #f0f0f0;
 }
 
+.heading {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 0px !important;
+}
+.heading > h1 {
+  text-align: center;
+}
+
+#filter-btns, #search-btns {
+  
+  border: 0.5px black solid;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  background-color: #dddddd;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+#filter-btns {
+  justify-content: space-evenly;
+}
+
+#filter-btns > div {
+  display: flex;
+  flex-direction: column;
+  width: 16% !important;
+}
+
+#filter-btns > button, #search, #backlogs, #activity-logs, #openPopupButton, #add-subtask, #add-task {
+  padding: 7px 10px;
+  margin-bottom: 0;
+  font-weight: 600;
+  border-radius: 4px;
+  border-width: thin;
+  cursor: pointer;
+}
+
+#apply-filters {
+  color: #08871e;
+  border-color: #08871e;
+}
+#search {
+  color: #08871e;
+  border-color: #08871e;
+}
+#apply-filters:hover {
+  background-color: #08871e;
+  color: #fff;
+}
+#clear-filters:hover {
+  background-color: #b40000;
+  color: #fff;
+}
+#search:hover {
+  background-color: #08871e;
+  color: #fff;
+}
+#clear-filters {
+  color: #b40000;
+  border-color:  #b40000;
+}
+
+#search-btns > div {
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+}
+#search-btns > * {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+#backlogs {
+  padding: 8px 12px;
+  color:#08871e;
+  border-color: #08871e;
+}
+#backlogs:hover {
+  background-color:#08871e;
+  color: #fff
+}
+#activity-logs {
+  padding: 8px 12px;
+  color:#b40000;
+  border-color: #b40000;
+}
+#activity-logs:hover {
+  background-color:#b40000;
+  color: #fff
+}
+#openPopupButton, #add-subtask, #add-task {
+  padding: 8px 12px;
+  color:#000;
+  border-color: #000;
+}
+#openPopupButton:hover, #add-subtask:hover, #add-task:hover {
+  background-color:#000;
+  color: #fff
+}
+.top-btns {
+  position: absolute;
+  right: 5px;
+  top: 28px;
+  display: flex;
+  justify-content: end;
+}
+.top-btns > button {
+  margin-left: 5px;
+}
+#tasks-div {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .add-task-container {
     display: none;
     position: fixed;
@@ -16,34 +132,12 @@ body {
     justify-content: center;
     align-items: center;
   }
-#top-container-btns {
-    position: fixed;
-    height: 100%;
-    width: 30%;
-    border-right: 2px gray solid;
-}
 #top-container-btns > * {
-    width: 80%;
+    /* width: 80%; */
     margin-bottom: 10px;
     padding: 5px 10px;
 }
-#top-container-btns > div {
-    border: 0.5px black solid;
-    border-radius: 8px;
-}
-#top-container-btns > div > * {
-    width: 100%;
-    margin-bottom: 10px;
-}
 
-  #openPopupButton {
-    padding: 10px;
-    margin: 5px;
-  }
-  
-  input {
-    width: 100%;
-  }
 
   #priority > div {
     display: flex;
@@ -52,12 +146,15 @@ body {
     width: auto;
   }
   #task-form {
+    width: 50%;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-
+  #task-form > * {
+    margin-top: 5px;
+  }
   .close-button {
     cursor: pointer;
     position: absolute;
@@ -72,6 +169,8 @@ body {
     flex-direction: column;
 }
 .task-card {
+    flex-basis: calc(100% / 2);
+    margin: 10px;
     max-width: 400px;
     margin: 20px auto;
     background-color: #ffffff;
@@ -80,6 +179,35 @@ body {
     border-radius: 5px;
     display: flex;
     flex-direction: column;
+}
+.tags {
+  display: inline;
+}
+.tags> span {
+  background-color: #e2dada;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 2px;
+}
+.marked-done {
+  text-decoration: line-through;
+}
+
+
+.mark-done-btn, .mark-undone-btn, .delete-btn, .edit-btn {
+  color: #fff;
+  border-color: transparent;
+  border-radius: 4px;
+  width: 33%;
+}
+.mark-done-btn, .mark-undone-btn {
+  background-color: #2e812e;
+}
+.delete-btn {
+  background-color: #e01919;
+}
+.edit-btn {
+  background-color: #1776df;
 }
 .name {
     font-size: 24px;
@@ -123,12 +251,12 @@ body {
   }
 
 .btns {
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     justify-content: space-between;
 }
 .btns > button {
-    width: 33%;
+    /* width: 33%; */
     padding: 10px;
 }
 

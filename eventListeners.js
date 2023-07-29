@@ -58,6 +58,12 @@ document.addEventListener('click', (ele) => {
         markDoneUndone(ele.target.name, ele.target, false);
         return;
     }
+    if(ele.target.classList.contains('subtask-mark-done')){
+        const taskId = ele.target.name.split('-')[0];
+        const index = ele.target.name.split('-')[1];
+        markSubtaskDone(taskId, index, ele.target)
+        return;
+    }
 }) ;
 
 
@@ -66,29 +72,30 @@ document.getElementById('add-subtask').addEventListener(('click'), () => {
     const inputfield = document.createElement('input');
     inputfield.type="text";
     inputfield.name="subtask";
+    inputfield.placeholder="Subtask..."
     subtasksDiv.append(inputfield);
 });
 
 
-document.getElementById('filter-by-due-date').addEventListener(('click'), () => {
-    console.log('filter button triggered')
-    displayTasks(sortByDueDate());
-});
-document.getElementById('filter-by-category').addEventListener(('click'), () => {
-    console.log('filter button triggered')
-    const inputField = document.getElementById('filter-category-input');
-    displayTasks(filterByCategory(inputField.value));
-});
-document.getElementById('filter-by-priority').addEventListener(('click'), () => {
-    console.log('filter button triggered')
-    displayTasks(sortByPriority());
-});
+// document.getElementById('filter-by-due-date').addEventListener(('click'), () => {
+//     console.log('filter button triggered')
+//     displayTasks(sortByDueDate());
+// });
+// document.getElementById('filter-by-category').addEventListener(('click'), () => {
+//     console.log('filter button triggered')
+//     const inputField = document.getElementById('filter-category-input');
+//     displayTasks(filterByCategory(inputField.value));
+// });
+// document.getElementById('filter-by-priority').addEventListener(('click'), () => {
+//     console.log('filter button triggered')
+//     displayTasks(sortByPriority());
+// });
 document.getElementById('backlogs').addEventListener(('click'), () => {
-    console.log('filter button triggered')
+    const tasksDiv = document.getElementById('tasks-div');
+    tasksDiv.innerHTML = '<h2>Backlogs: </h2>';
     displayTasks(backlogs());
 });
 document.getElementById('activity-logs').addEventListener(('click'), () => {
-    console.log('filter button triggered')
     
     const tasksDiv = document.getElementById('tasks-div');
     tasksDiv.innerHTML = '';
@@ -96,25 +103,18 @@ document.getElementById('activity-logs').addEventListener(('click'), () => {
         activityLog(log);
     })
 });
-document.getElementById('exact-search').addEventListener(('click'), () => {
-    console.log('filter button triggered')
-    const inputField = document.getElementById('exact-search-input');
-    displayTasks(searchExact(inputField.value));
+document.getElementById('search').addEventListener(('click'), () => {
+    const combinedSearch = document.getElementById('combined-search').value.trim();
+    const searchByTags = document.getElementById('tags-search').value.trim();
+    displayTasks(search(combinedSearch, searchByTags));
 });
-document.getElementById('subtask-search').addEventListener(('click'), () => {
-    const inputField = document.getElementById('subtask-search-input');
-    displayTasks(searchBySubtasks(inputField.value.split(',')));
+document.getElementById('apply-filters').addEventListener(('click'), () => {
+    displayTasks(filter());
 });
-document.getElementById('similar-words-search').addEventListener(('click'), () => {
-    const inputField = document.getElementById('similar-words-search-input');
-    displayTasks(searchBySubtasks(inputField.value));
+document.getElementById('clear-filters').addEventListener(('click'), () => {
+    document.getElementById('category-filter').value = '';
+    document.getElementById('due-date-range-from').value = '';
+    document.getElementById('due-date-range-to').value = '';
+    document.getElementById('priority').value = 'all';
+    document.getElementById('sort-by').value = 'dueDate';
 });
-document.getElementById('partial-search').addEventListener(('click'), () => {
-    const inputField = document.getElementById('partial-search-input');
-    displayTasks(searchPartial(inputField.value));
-});
-document.getElementById('tags-search').addEventListener(('click'), () => {
-    const inputField = document.getElementById('tags-search-input');
-    displayTasks(searchByTags(inputField.value.split(',')));
-});
-
