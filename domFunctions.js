@@ -78,9 +78,7 @@ function addEditTask( id, isAdd = true) {
     task.category = form.elements['category'].value.trim();
     task.tags = form.elements['tag'].value.trim().split(',');
 
-    if(formattedDueDate != '')
-        task.dueDate = formattedDueDate;
-    else if(form.elements['due-date'].value.trim() == "") 
+    if(form.elements['due-date'].value.trim() == "") 
         task.dueDate = new Date().toISOString().slice(0, 10);
     else task.dueDate = form.elements['due-date'].value;
     
