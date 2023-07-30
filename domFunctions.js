@@ -71,7 +71,7 @@ function addTaskToTheDiv(taskDiv, task){
 function addEditTask( id, isAdd = true) {
     let task = {};
     task.id=id;
-    const taskText = form.elements['name'].value();
+    const taskText = form.elements['name'].value;
 
     task.name = taskText;
     task.priority = form.elements['priority'].value;

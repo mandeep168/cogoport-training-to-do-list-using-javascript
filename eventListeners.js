@@ -15,7 +15,7 @@ openPopupButton.addEventListener("click", () => {
 // fetching data from localstorage
 tasks.forEach(task => {
     addTaskToTheDom(task);
-    id = task.id;
+    id = parseInt(task.id);
 });
 
 document.addEventListener('keypress', function (e) {
@@ -77,19 +77,6 @@ document.getElementById('add-subtask').addEventListener(('click'), () => {
 });
 
 
-// document.getElementById('filter-by-due-date').addEventListener(('click'), () => {
-//     console.log('filter button triggered')
-//     displayTasks(sortByDueDate());
-// });
-// document.getElementById('filter-by-category').addEventListener(('click'), () => {
-//     console.log('filter button triggered')
-//     const inputField = document.getElementById('filter-category-input');
-//     displayTasks(filterByCategory(inputField.value));
-// });
-// document.getElementById('filter-by-priority').addEventListener(('click'), () => {
-//     console.log('filter button triggered')
-//     displayTasks(sortByPriority());
-// });
 document.getElementById('backlogs').addEventListener(('click'), () => {
     const tasksDiv = document.getElementById('tasks-div');
     tasksDiv.innerHTML = '<h2>Backlogs: </h2>';
