@@ -121,3 +121,45 @@ document.getElementById('clear-filters').addEventListener(('click'), () => {
 document.getElementById('task-name').addEventListener(('click'), () => {
     parseDueDate();
 });
+
+
+const taskCards = document.querySelectorAll('.task-card');
+// const tasksDiv = document.getElementById('tasks-div');
+let draggedItem = null;
+let draggedOver = null;
+
+for( task of taskCards) {
+    task.addEventListener('dragstart', (e) =>{
+        draggedItem = e.target;
+    })
+
+    task.addEventListener('dragend', (e) => {
+        e.preventDefault();
+        try {
+            if(draggedItem != null && draggedOver != null) {
+            
+                tasksDiv.insertBefore(draggedItem, draggedOver);
+                const taskDraggedIndex = tasks.findIndex(task => task.id == draggedItem.id);
+                const taskDraggedOverIndex = tasks.findIndex(task => task.id == draggedOver.id);
+                const draggedTask = tasks[taskDraggedIndex];
+                tasks.splice(taskDraggedIndex, 1);
+                tasks = [
+                    ...tasks.slice(0, taskDraggedOverIndex),
+                    draggedTask,
+                    ...tasks.slice(taskDraggedOverIndex)
+                ]
+                
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+            draggedItem = null;
+            draggedOver = null;
+        } catch (error) {
+            console.log(error);
+        }
+    })
+    task.addEventListener('dragover', (e) => {
+        if(e.target.classList.contains('task-card')) {
+            draggedOver = e.target;
+        }
+    })
+}

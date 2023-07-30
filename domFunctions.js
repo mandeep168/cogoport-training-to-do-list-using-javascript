@@ -185,6 +185,7 @@ function addTaskToTheDom(task) {
 
         taskDiv.setAttribute('id', task.id);
         taskDiv.classList.add('task-card');
+        taskDiv.setAttribute('draggable', true);
 
         addTaskToTheDiv(taskDiv, task);
 
