@@ -129,45 +129,50 @@ function backlogs() {
 
 
 function search(combinedSearch, searchByTags) {
-    const searchKeywords = combinedSearch.split(",").map((keyword) => keyword.trim());
-    const tagSearchKeywords = searchByTags.split(",").map((keyword) => keyword.trim());
     const searchResults = [];
 
-    searchKeywords.forEach((keyword) => {
-        const searchTermLower = keyword.toLowerCase();
-        const results = tasks.filter((task) => {
-            const taskNameLower = task.name.toLowerCase();
-            const subtasksLower = task.subtasks.map((subtask) => subtask.name.toLowerCase());
-            const tagsLower = task.tags.map((tag) => tag.toLowerCase());
+    if(combinedSearch == '' && searchByTags == '') return tasks;
 
-            return (
-                taskNameLower.includes(searchTermLower) || // Partial search for task names
-                taskNameLower === searchTermLower || // Exact search for task names
-                taskNameLower.includes(searchTermLower) || // Similar words search for task names
-                subtasksLower.some((subtask) => subtask.includes(searchTermLower)) // Search in subtasks
-                // tagsLower.some((tag) => tag.includes(searchTermLower)) // Search in subtasks
-            );
+    if(combinedSearch != ''){
+        const searchKeywords = combinedSearch.split(",").map((keyword) => keyword.trim());
+        searchKeywords.forEach((keyword) => {
+            const searchTermLower = keyword.toLowerCase();
+            const results = tasks.filter((task) => {
+                const taskNameLower = task.name.toLowerCase();
+                const subtasksLower = task.subtasks.map((subtask) => subtask.name.toLowerCase());
+
+                return (
+                    taskNameLower.includes(searchTermLower) || // Partial search for task names
+                    taskNameLower === searchTermLower || // Exact search for task names
+                    // taskNameLower.includes(searchTermLower) || // Similar words search for task names
+                    subtasksLower.some((subtask) => subtask.includes(searchTermLower)) // Search in subtasks
+                );
+            });
+        
+            results.forEach(result => {
+                if(!searchResults.includes(result)) searchResults.push(result);
+            })
         });
+    }
+
+
+    if(searchByTags  != '') {
+        const tagSearchKeywords = searchByTags.split(",").map((keyword) => keyword.trim());
+        tagSearchKeywords.forEach((keyword) => {
+            const searchTermLower = keyword.toLowerCase();
+            const results = tasks.filter((task) => {
+                const tagsLower = task.tags.map((tag) => tag.toLowerCase());
     
-        results.forEach(result => {
-            if(!searchResults.includes(result)) searchResults.push(result);
-        })
-    });
-
-    tagSearchKeywords.forEach((keyword) => {
-        const searchTermLower = keyword.toLowerCase();
-        const results = tasks.filter((task) => {
-            const tagsLower = task.tags.map((tag) => tag.toLowerCase());
-
-            return (
-                tagsLower.some((tag) => tag.includes(searchTermLower)) // Search in tags
-            );
+                return (
+                    tagsLower.some((tag) => tag.includes(searchTermLower)) // Search in tags
+                );
+            });
+        
+            results.forEach(result => {
+                if(!searchResults.includes(result)) searchResults.push(result);
+            })
         });
-    
-        results.forEach(result => {
-            if(!searchResults.includes(result)) searchResults.push(result);
-        })
-    });
+    }
 
     return searchResults;
 }
